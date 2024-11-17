@@ -8,5 +8,6 @@ The conclusion of our first model was that:
     - We can improve it with more data, and possibly rounding the latitude and longitude to more decimals to ensure that we have more accuracy.
     - We notes that the decimal rounding was already quite accurate, with each point about less than 1-2 mi between each point in a lattice.
 
-Preprocessing in preprocess.ipynb
-Model in model.ipynb
+### Notebooks:
+- Preprocessing in preprocess.ipynb
+- Model in model.ipynb
