@@ -11,3 +11,23 @@ The conclusion of our first model was that:
 ### Notebooks:
 - Preprocessing in preprocess.ipynb
 - Model in model.ipynb
+
+## Milestone 4 Methods
+
+To improve our model from polynomial regression, we opted to create a ANN with three layers. 
+
+### Fare Price Calculation
+
+For the fare model, we reduced our Test MSE from 11.70 (polynomial regression) to 9.571 (ANN), and we also increased our R-squared score from 0.835 (polynomial regression) to 0.869. 
+
+### Duration Calculation
+
+For the duration model, we also tried a ANN, but our model performed poorly, with an R-squared value of close to 0. After further testing, we believe that a neural network is too ocmplex of a model to accurately represent the duration prediction.
+
+So, we decided to try a decision tree model instead. [TODO: explain a little about this model]. This model worked much better, reducing our Test MSE to 48118, and increasing our R-squared value to 0.472. 
+
+## Conclusion
+
+For our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. We could consider adding more layers, such as a dropout layer.
+
+For our decision tree model, [TODO: how can we improve it?].
