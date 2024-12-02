@@ -24,7 +24,7 @@ For the fare model, we reduced our Test MSE from 11.70 (polynomial regression) t
 
 For the duration model, we also tried a ANN, but our model performed poorly, with an R-squared value of close to 0. After further testing, we believe that a neural network is too complex of a model to accurately represent the duration prediction.
 
-So, we decided to try a decision tree model instead. [TODO: explain a little about this model]. This model worked much better, reducing our Test MSE to 48118, and increasing our R-squared value to 0.472. 
+So, we decided to try a decision tree model instead. A decision tree regressor splits the data into subsets based on feature values. This model worked much better, reducing our Test MSE to 48118, and increasing our R-squared value to 0.472. 
 
 ## Conclusion
 
