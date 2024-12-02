@@ -22,7 +22,7 @@ For the fare model, we reduced our Test MSE from 11.70 (polynomial regression) t
 
 ### Duration Calculation
 
-For the duration model, we also tried a ANN, but our model performed poorly, with an R-squared value of close to 0. After further testing, we believe that a neural network is too ocmplex of a model to accurately represent the duration prediction.
+For the duration model, we also tried a ANN, but our model performed poorly, with an R-squared value of close to 0. After further testing, we believe that a neural network is too complex of a model to accurately represent the duration prediction.
 
 So, we decided to try a decision tree model instead. [TODO: explain a little about this model]. This model worked much better, reducing our Test MSE to 48118, and increasing our R-squared value to 0.472. 
 
@@ -30,4 +30,4 @@ So, we decided to try a decision tree model instead. [TODO: explain a little abo
 
 For our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. We could consider adding more layers, such as a dropout layer.
 
-For our decision tree model, [TODO: how can we improve it?].
+For our decision tree model, we can improve it by tuning hyperparameters like max_depth, min_samples_split, and min_samples_leaf. Using feature engineering and employing cross-validation can also enhance its performance and generalization.
