@@ -47,6 +47,7 @@ The next model we are thinking of using is some kind of gradient boosting model,
 ## Conclusion
 
 **Fare:**
+
 When predicting fare price, the neural network performed well, with a R2 value of 0.869. However, this neural network performed poorly when trying to predict trip duration, with an R2 value of -0.005, indicating that this model performed worse than just predicting the mean. We believe this was because the neural network was too simple to predict the duration we were looking for with the data we were using. We decided to explore other models for predicting duration for this reason. 
     
 For our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. After adding more layers, we can add some dropout layers to ensure the model is able to propagate the loss properly through the model. We could also use a different optimizer, more high quality data, and more epochs.
@@ -54,6 +55,7 @@ We also tried to do hyperparameter search to optimize the neural network, but we
 
 
 **Duration:**
+
 We found duration to be quite difficult to model. We believe this is because duration has a lot of random factors which can affect it while fare is most likely determined by distance travelled and time of the day. We think the random factors which affect the duration could have included traffic, rush hour, large events, etc. A decision tree would have an easier time generalizing for these random factors. As such, we tried a decision tree, and achieved a much better R2 value of 0.472.
     
 For our decision tree model, we can improve it by tuning hyperparameters like max_depth, min_samples_split, and min_samples_leaf. We also employed feature engineering, especially in the Haversine distance function which ensured that the distances actually were able to convert from geographical location to a measurable distance the model could understand. With better feature engineering and more high quality data, we can enhance its performance and better measure it with cross-validation.
