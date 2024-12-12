@@ -111,8 +111,6 @@ The target variable was fare_amount. We split the dataset into 80% training and 
 
 While the model captured some basic relationships, the relatively high error indicated that linear regression struggled with the complexity of the data. However, given the R2 value, we saw that this was quite ideal. We believed that using a Polynomial Regression model might have been a better choice. Also, we forgot to apply feature scaling and normalization, which would have increased model performance, especially for Linear Regression. There was also a lack of more nuanced features, such as weather conditions or time of day as taxi driver fares can change due to the length of trips in these conditions. This would have allowed us to capture more variability of the data. We did not consider any regularization techniques such as Ridge or Lasso regression because we believed our model was not overfitting. This was due to the fact we had a relatively high R2 value, but was not egregiously high.
 
-If we were to repeat this, we would have used a Polynomial Regression model. This is because it is allowed to capture more complex relationships in the data. By increasing how complex the model is, we are able to generalize more to the data. However, given the quite high R2 value, we kept it here. We also worried that this would make the model overfit to the data, another problem we feared would actually set us back. We also considered rounding the latitude and longitude even further, but decided against it as it would remove too much meaningful information the model could use to learn.
-
 ![Figure 8](images/figure8.png)
 
 Fig 8.  Predicted vs. actual fare amounts for model 1, with the red line indicating perfect predictions. 
@@ -131,7 +129,6 @@ For predicting trip duration, we saw from our data exploration and preprocessing
 | Median | 524.0 seconds |
 | 75th | Percentile 828.0 seconds |
 | Maximum | 1,763,934.0 seconds |
-
 
 First, we limited the trip_duration column to rows with at least 120 seconds and no more than 1000 seconds. We found that this already captured most of the data, while removing much of the weird data. Specifically, we considered trips that were between 2 and 16.67 minutes. Next, we calculated the Manhattan distance between the latitude and longitude pairs, as cars in New York City would be likely to travel along a grid-like structure (which is why it is called Manhattan Distance). 
 
@@ -241,3 +238,37 @@ If we were to improve this, we would find more higher quality data, ideally with
 ![Figure 11](images/figure11.png)
 
 Fig 11.  Predicted vs. actual durations for model 2, with the red line indicating perfect predictions. 
+
+# Conclusion:
+
+### Fare Prediction:
+
+When predicting fare price, the neural network performed well, with a R2 value of 0.869. To improve our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. After adding more layers, we can add some dropout layers to ensure the model is able to propagate the loss properly through the model. We could also use a different optimizer, more high quality data, and more epochs. We also tried to do hyperparameter search to optimize the neural network, but we found that no matter what, we could not break the 0.869 R2 value. 
+
+For our model, we opted to use 100k rows in an effort to avoid overfitting, so one thing we can try is changing the amount of data we use. Either using less rows, or using more rows and use regularization or dropout layers to avoid overfitting. 
+
+Overall though, we’re pretty happy with the performance of this model. With the amount of noise that’s in our dataset, we know that achieving a 100% accuracy is generally unfeasible. Any way we change our model could have an adverse effect by causing overfitting. With our current model, we found that if we tried to train our neural network for more than 110 epochs, our model would overfit and the accuracy would actually get worse, so more isn’t always the best. 
+
+### Duration Prediction:
+
+The duration model, on the other hand, was a much harder task. When we tried the same neural network as for the fare price calculation, we got a R2 value of -0.005, which is worse than just guessing the mean. We believe this is because duration has a lot of random factors which can affect it while fare is most likely determined by distance traveled and time of the day. We think the random factors which affect the duration could have included traffic, rush hour, large events, etc. We decided that a decision tree would have an easier time generalizing for these random factors, so we tried a decision tree, and achieved a much better R2 value of 0.472.
+
+For our decision tree model, we can improve it by tuning hyperparameters like max_depth, min_samples_split, and min_samples_leaf. We also employed feature engineering, especially in the Haversine distance function which ensured that the distances actually were able to convert from geographical location to a measurable distance the model could understand. With better feature engineering and more high quality data, we can enhance its performance and better measure it with cross-validation.
+
+Another improvement which we could have tried to improve our model would have been to use gradient boosting. This is because a gradient boosting would have used more than one tree to combine predictions and find more complex relationships in the data. Gradient boosting would theoretically work well with our data since it is better able to work with categorical and numeric data due to its ability to find the features which matter the most.
+
+We were pretty disappointed with the results of the initial neural network, but when we switched to the decision tree model, we were much happier with the results. While a R2 value of 0.472 isn’t an extremely high value, we realized that the duration data has lots of noise within it, and that there isn’t a perfect correlation, so we’re pretty happy with the results. 
+
+# Statement of Contribution
+
+Aniket:
+
+Kyle:
+
+Mahmoud:
+
+Pranav:
+
+Rahul: Worked on creating the plots for plotting the model results. Contributed to the data preprocessing; Attempted model tuning for Milestone 4.
+
+Sammyo: Contributed to the data preprocessing and exploration. Revised writeup for Milestone 4 submission, and wrote Data Exploration and Preprocessing sections for final writeup.
