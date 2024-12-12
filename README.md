@@ -315,7 +315,7 @@ We were pretty disappointed with the results of the initial neural network, but 
 
 `Kyle`: Contributed on inital data exploration, data processing, wrote Model 1 and Model 2, figured out how to optimize the models + hyperparameter tuning, reminded teammates of deadlines. Primary contributor to Model 2, analysis of the models, writeups, and discussion about future methods to increase model performance.
 
-`Mahmoud`: 
+`Mahmoud`: Worked on identifying and exploring the dataset. Contributed to the planning of model 2 and wrote model explanations in milestone 4 report. Worked on the introduction and compiling and analyzing visual figures for the final writeup. 
 
 `Pranav`: Setup code to import data from Kaggle into Google Collab as a pandas dataframe for data preprocessing. Found out what fitting graph meant on the intructions, and discussed with group on how to evaluate model based on fitting graph. Also made a discord post on it to get clarification from the professor (this may have also helped other groups out). Contributed the idea of using XGBoost for future improvements of our model. Wrote extensive portions of the model evaluation and fitting graph sections on the writeup for milestone 4, including the comparisons of the R2 score and MSE for the models.
 
