@@ -138,7 +138,7 @@ For predicting trip duration, we saw from our data exploration and preprocessing
 | 75th Percentile | 828.0 seconds       |
 | Maximum         | 1,763,934.0 seconds |
 
-First, we limited the trip_duration column to rows with at least 120 seconds and no more than 1000 seconds. We found that this already captured most of the data, while removing much of the weird data. Specifically, we considered trips that were between 2 and 16.67 minutes. Next, we calculated the Manhattan distance between the latitude and longitude pairs, as cars in New York City would be likely to travel along a grid-like structure (which is why it is called Manhattan Distance).
+First, we limited the `trip_duration` column to rows with at least 120 seconds and no more than 1000 seconds. We found that this already captured most of the data, while removing much of the outlier data. Specifically, we considered trips that were between 2 and 16.67 minutes. Next, we calculated the Manhattan distance between the latitude and longitude pairs, as cars in New York City would be likely to travel along a grid-like structure (which is why it is called Manhattan Distance).
 
 First, we used a Linear Regression model to see if we could get a good generalization.
 
@@ -146,11 +146,11 @@ With a poor MSE, we then tried Polynomial Regression with 2 degrees of freedom. 
 
 ## Model 2
 
-Our second model focused on improving the predictions for both fare price and the trip duration. Firstly, to address the limitations of the previous models, we tried to implement a much more complex model, a neural network. Then, we built a decision tree when we realized this was not able to generalize to the data as well.
+Our second model focused on improving the predictions for both fare price and the trip duration. Firstly, to address the limitations of the previous models, we tried to implement a much more complex model, a neural network. When we realized that this model was not able to generalize to the data well (or at least, with the complexity of the neural network), we built a decision tree.
 
 ### Fare Prediction
 
-As before, we split the data to 80:20, train and test and used a set seed to ensure that we could reproduce the material. Then, we used StandardScaler() to ensure that our data was normalized so that the neural network could perform better on it. Here, we decided to use tensorflow since it contained the libraries needed to build this model. This was
+As before, we split the data to 80:20, `train` and `test` and used a set seed to ensure that we could reproduce the material. Then, we used `StandardScaler()` to ensure that our data was normalized so that the neural network could perform better on it. Here, we decided to use tensorflow since it contained the libraries needed to build this model. This was
 our model architecture:
 
 | Layer          | Params                      |
@@ -161,35 +161,35 @@ our model architecture:
 
 We then used MSE as our loss function to penalize large prediction errors. Then, our optimizer was the Adam optimizer. The reason we used this was because it would adaptively change the learning rate while training to ensure the model could converge appropriately. Since we had a lot of features that represented different values, we found that this was more effective than SGD.
 
-Our learning rate was 0.001. This was because we found that too high learning rates would cause the optimizer to not be able to reach the global minima (or at least the local minima) in a reasonable amount of time (or quite frankly, ever). Additionally, because the Adam optimizer was able to change the learning rate dynamically, we recognized that setting the learning rate to a lower magnitude would allow the Adam optimizer to explore more options.
+Our learning rate was `0.001`. This was because we found that too high learning rates would cause the optimizer to not be able to reach the global minima (or at least the local minima) in a reasonable amount of time (or quite frankly, ever). Additionally, because the Adam optimizer was able to change the learning rate dynamically, we recognized that setting the learning rate to a lower magnitude would allow the Adam optimizer to explore more options and thus eventually converge.
 
-We used a batch size of 32 so that the model could frequently update itself with new data each time. From previous experience, Kyle recognized that using a batch size that was a power of 2. We wanted to speed up the convergence also. We also used this because it was the standard for most models.
+We used a batch size of 32 so that the model could frequently update itself with new data each time. From previous experience, Kyle recognized that using a batch size that was a power of 2 would give the best results, especially as it would decrease the time for the model to converge. We also used this because it was the standard for most models. By speediing up the training time for our models, we were able to iterate over hyperparameter such much faster (fail fast system).
 
-Then, we used 110 epochs. This was kind of arbitrary since we were unsure how far we could get the model to train. We started from a low amount of epochs, then increased it by 10 until the model dropped in performance.
+Then, we used 110 epochs. This was kind of arbitrary since we were unsure how far we could get the model to train. We started from a low amount of epochs, then increased it by 10 until the model dropped in performance. Additionally, we felt that since the Adam optimizer would dynamically change the learning rate, increasing the number of epochs would not necessarily increase performance as the model would dynamically change its learning.
 
 ### Trip Duration Prediction
 
 For the trip duration, we wanted to try a neural network at first again. We had the same model as before, but properly fit to the input data. We also used MSE as it would again, penalize
 
-The big difference here was that we used a much smaller learning rate for the Adam optimizer, at 0.0001. This is because in initial testing, we found that the model would converge too quickly at any learning rate higher than this one. Additionally, we found that the data was much noisier as shown in the graph, so a small step size would ensure a smoother gradient update every iteration. We kept the same batch size as before. We also found that despite the number of epochs added, the model would not converge and showed no sign of decreasing the MSE. The R2 was extremely close to 0, so much in fact that during initial testing, some of our teammates had R2 values below 0, indicating that it was performing worse than a simple mean.
+The big difference here was that we used a much smaller learning rate for the Adam optimizer, at `0.0001`. This is because in initial testing, we found that the model would converge too quickly at any learning rate higher than this one. Additionally, we found that the data was much noisier as shown in the graph, so a small step size would ensure a smoother gradient update every iteration. We kept the same batch size as before. We also found that despite the number of epochs added, the model would not converge and showed no sign of decreasing the MSE. The R2 was extremely close to 0, so much in fact that during initial testing, some of our teammates had R2 values below 0, indicating that it was performing worse than a simple mean.
 
 On our second attempt, we tried a Decision Tree Regressor. We decided to do this because our trip duration models were not getting any remotely good results, so we had to try a new radical idea. The decision tree model was able to split the data based on feature values, allowing it to capture more of the data and create better non-linear relationships. In particular, we noticed that it was able to generalize better to the noise and variability of the data as opposed to a neural network.
 
-We also did some feature engineering, specifically using the Haversine distance formula to determine the distance between two points on a sphere. We chose to do this because we found that the latitude and longitude values were too close to each other for the model to generalize to them. There was not enough variance between the points.
+We also did some feature engineering, specifically using the Haversine distance formula to determine the distance between two points on a sphere (in this case, the Earth). We chose to do this because we found that the latitude and longitude values were too close to each other for the model to generalize to them, espcially as we had rounded the data points to only 3 decimal places.
 
-Then, we found that too much of the data was quite noisy, so we used the Interquartile Range to remove the outliers. Although this meant we would not be able to capture as much data, it meant that we would be able to make better predictions for a much larger amount of data. After this, we implemented sklearn's GridSearchCV to try and find the optimal tree hyperparameters. Below are the values we tried:
+Then, we found that too much of the data was quite noisy, so we used the Inter-Quartile Range to remove the outliers. Although this meant we would not be able to capture as much data, it meant that we would be able to make better predictions for a much larger amount of data. After this, we implemented sklearn's `GridSearchCV` to try and find the optimal tree hyperparameters. Below are the values we tried:
 
-| Parameter         | Value           |
-| ----------------- | --------------- |
-| max_depth         | [5, 10, 15, 20] |
-| min_samples_split | [2, 5, 10, 20]  |
-| min_samples_leaf  | [1, 2, 5, 10]   |
+| Parameter           | Value             |
+| ------------------- | ----------------- |
+| `max_depth`         | `[5, 10, 15, 20]` |
+| `min_samples_split` | `[2, 5, 10, 20]`  |
+| `min_samples_leaf`  | `[1, 2, 5, 10]`   |
 
 Our model found these values to be optimal:
 
-- max_depth = 5
-- min_samples_split = 20
-- min_samples_leaf = 1
+- `max_depth` = 5
+- `min_samples_split` = 20
+- `min_samples_leaf` = 1
 
 These values made sense because the model did not need to be too complex as we had shown in our first neural network. The depth was chosen to be quite low and the minimum split would not go above 20 in this grid, ensuring we prevented overfitting to offset a simpler model. The last hyperparameter this GridSearch chose was the number of samples each leaf nodded needed. For some reason, it found that making the model more complex here was optimal. We were not sure why the model did this, but the results were undeniably better than the previous 3 models.
 
@@ -233,16 +233,17 @@ These results were quite significant, as had a much lower MSE, and a dramaticall
 
 ![Figure 10](images/figure10.png)
 
-Fig 10. Predicted vs. actual fare amounts for model 2, with the red line indicating perfect predictions.
+Fig 10. Predicted vs. actual fare amounts for Model 2, with the red line indicating perfect predictions.
 
 ### Trip Duration Prediction
 
-For our duration prediction, our neural network didn’t work well at all, with a R2 value of -0.005. So, we tried a decision tree model, which worked much better, with a result of:
+For our taxi duration prediction, our neural network model didn’t work well at all, with a R2 value of -0.005. So, we tried a decision tree model, which worked much better, with a result of:
 
-| Metric | Value |
+| Metric    | Value             |
+| --------- | ----------------- |
 | Train MSE | 47754.42568249549 |
-| Test MSE | 48118.06320689619 |
-| R-squared | 0.472 |
+| Test MSE  | 48118.06320689619 |
+| R-squared | 0.472             |
 
 ![Figure 11](images/figure11.png)
 
@@ -288,11 +289,11 @@ If we were to improve this, we would find more higher quality data, ideally with
 
 ### Fare Prediction:
 
-When predicting fare price, the neural network performed well, with a R2 value of 0.869. To improve our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. After adding more layers, we can add some dropout layers to ensure the model is able to propagate the loss properly through the model. We could also use a different optimizer, more high quality data, and more epochs. We also tried to do hyperparameter search to optimize the neural network, but we found that no matter what, we could not break the 0.869 R2 value.
+When predicting fare price, the neural network performed well, with a R2 value of `0.869`. To improve our neural network, we could try to add some more layers. For now, it's a relatively simple neural network with only three dense layers. After adding more layers, we can add some dropout layers to ensure the model is able to propagate the loss properly through the model. We could also use a different optimizer, more high quality data, and more epochs. We also tried to do hyperparameter search to optimize the neural network, but we found that no matter what, we could not break the `0.869` R2 value.
 
-For our model, we opted to use 100k rows in an effort to avoid overfitting, so one thing we can try is changing the amount of data we use. Either using less rows, or using more rows and use regularization or dropout layers to avoid overfitting.
+For our model, we opted to use > 100,000 rows in an effort to avoid overfitting, so one thing we can try is changing the amount of data we use. Either using less rows, or using more rows and use regularization or dropout layers to avoid overfitting.
 
-Overall though, we’re pretty happy with the performance of this model. With the amount of noise that’s in our dataset, we know that achieving a 100% accuracy is generally unfeasible. Any way we change our model could have an adverse effect by causing overfitting. With our current model, we found that if we tried to train our neural network for more than 110 epochs, our model would overfit and the accuracy would actually get worse, so more isn’t always the best.
+Overall though, we’re pretty happy with the performance of this model. With the amount of noise that’s in our dataset, we know that achieving performance near 100% accuracy is generally unfeasible. Any way we change our model could have an adverse effect by causing overfitting. With our current model, we found that if we tried to train our neural network for more than 110 epochs, our model would overfit and the accuracy would actually get worse, so more isn’t always the best.
 
 ### Trip Duration Prediction:
 
@@ -306,17 +307,17 @@ We were pretty disappointed with the results of the initial neural network, but 
 
 # Statement of Contribution
 
-Aniket: Contributed to both data exploration and preprocessing. Wrote model 1 with Kyle and Rahul, and wrote model 2 with entire team. Wrote results and conclusion section of writeup, and reviewed entire final writeup.
+`Aniket`: Contributed to both data exploration and preprocessing. Wrote model 1 with Kyle and Rahul, and wrote model 2 with entire team. Wrote results and conclusion section of writeup, and reviewed entire final writeup.
 
-Kyle:
+`Kyle`: Contributed on inital data exploration, data processing, wrote Model 1 and Model 2, figured out how to optimize the models + hyperparameter tuning, reminded teammates of deadlines. Primary contributor to Model 2, analysis of the models, writeups, and discussion about future methods to increase model performance.
 
-Mahmoud:
+`Mahmoud`: 
 
-Pranav: Setup code to import data from Kaggle into Google Collab as a pandas dataframe for data preprocessing. Found out what fitting graph meant on the intructions, and discussed with group on how to evaluate model based on fitting graph. Also made a discord post on it to get clarification from the professor (this may have also helped other groups out). Contributed the idea of using XGBoost for future improvements of our model. Wrote extensive portions of the model evaluation and fitting graph sections on the writeup for milestone 4, including the comparisons of the R2 score and MSE for the models.
+`Pranav`: Setup code to import data from Kaggle into Google Collab as a pandas dataframe for data preprocessing. Found out what fitting graph meant on the intructions, and discussed with group on how to evaluate model based on fitting graph. Also made a discord post on it to get clarification from the professor (this may have also helped other groups out). Contributed the idea of using XGBoost for future improvements of our model. Wrote extensive portions of the model evaluation and fitting graph sections on the writeup for milestone 4, including the comparisons of the R2 score and MSE for the models.
 
-Rahul: Worked on creating the plots for plotting the model results. Contributed to the data preprocessing; Attempted model tuning for Milestone 4.
+`Rahul`: Worked on creating the plots for plotting the model results. Contributed to the data preprocessing; Attempted model tuning for Milestone 4.
 
-Sammyo: Contributed to the data preprocessing and exploration. Revised writeup for Milestone 4 submission, and wrote Data Exploration and Preprocessing sections for final writeup.
+`Sammyo`: Contributed to the data preprocessing and exploration. Revised writeup for Milestone 4 submission, and wrote Data Exploration and Preprocessing sections for final writeup.
 
 # Past Submissions:
 
