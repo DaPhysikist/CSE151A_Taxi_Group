@@ -277,7 +277,11 @@ Fig 9. Predicted vs. actual fare durations for model 1, with the red line indica
 
 ### Fare Prediction
 
-[TODO: add stuff here]
+In the beginning of the class, we felt that using a Linear Regression model would be enough considering the nature of the data. However, we quickly found that there were more complex models we were allowed to use that were more complex and thus perform better. With some experimentation, we tried a Polynomial Regression model with different degrees of freedom, but found that this was not enough. Eventaully, we saw that we could use a neural network. From inital testing, we saw that the model was enough to generalize the data a significant amount.
+
+We believe that there may be a more complex model that we could use to achieve 0.90+ or even 0.95+ R2 value. Indeed, adding more layers to the model did not help that much. We also found that as we kept trying more complex models with different hyperparameters and larger architectures, the models were taking a significant amount of time to train. This reduced the speed at which the team could iterate. 
+
+In general, we belive our results are quite believable. In NYC, fares have a base rate then follow a linear rate. In a perfect world, this could be modeled with linear regression. However, given that the world is not perfect, there was a lot of coufounding variables like speed, traffic, weather, time of trip (rush hour v,s, 2 AM), and time of year. Because of these, a sufficently advanced nerual network should be able to account for this extra factors and generalize them. 
 
 ### Trip Duration Prediction
 
