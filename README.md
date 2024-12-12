@@ -93,7 +93,7 @@ The number of decimal places that the coordinates were rounded to was determined
 
 ### Fare Prediction
 
-The model we used was linear regression. We implemented a basic linear regression model to predict taxi fares. The features included:
+We first tried the most basic regression model: linear regression. Our linear regression model included these features:
 
 - pickup_longitude_rounded	
 - pickup_latitude_rounded	
@@ -103,19 +103,11 @@ The model we used was linear regression. We implemented a basic linear regressio
 - trip_duration	
 - fare_amount
 
-The target variable was fare_amount. We split the dataset into 80% training and 20% testing sets using the sklearn.model_selection library. This was to ensure our model had enough data to learn off of, and enough testing data to ensure we could correctly evaluate the model. With a random state of 151, we were able to reproduce the data across many different machines, especially with a mostly asynchronous team. We were able to get these results:
+The target variable was fare_amount. We split the dataset into 80% training and 20% testing sets using the sklearn.model_selection library. This was to ensure our model had enough data to learn off of, and enough testing data to ensure we could correctly evaluate the model. With a random state of 151, we were able to reproduce the data across many different machines, especially with a mostly asynchronous team. 
 
-- Train MSE: 41.562368528526115
-- Test MSE: 38.86696472516666
-- R-squared: 0.782
+Seeing a relatively high error rate, we opted to try a Polynomial Regression model instead, with 2 degrees of freedom. We ended up using this as our final model 1. 
 
-While the model captured some basic relationships, the relatively high error indicated that linear regression struggled with the complexity of the data. However, given the R2 value, we saw that this was quite ideal. We believed that using a Polynomial Regression model might have been a better choice. Also, we forgot to apply feature scaling and normalization, which would have increased model performance, especially for Linear Regression. There was also a lack of more nuanced features, such as weather conditions or time of day as taxi driver fares can change due to the length of trips in these conditions. This would have allowed us to capture more variability of the data. We did not consider any regularization techniques such as Ridge or Lasso regression because we believed our model was not overfitting. This was due to the fact we had a relatively high R2 value, but was not egregiously high.
-
-![Figure 8](images/figure8.png)
-
-Fig 8.  Predicted vs. actual fare amounts for model 1, with the red line indicating perfect predictions. 
-
-## Trip Duration Prediction
+### Trip Duration Prediction
 
 For predicting trip duration, we saw from our data exploration and preprocessing that there were many outliers. Taking a look at the data, we had these statistics on trip_duration:
 
@@ -132,35 +124,16 @@ For predicting trip duration, we saw from our data exploration and preprocessing
 
 First, we limited the trip_duration column to rows with at least 120 seconds and no more than 1000 seconds. We found that this already captured most of the data, while removing much of the weird data. Specifically, we considered trips that were between 2 and 16.67 minutes. Next, we calculated the Manhattan distance between the latitude and longitude pairs, as cars in New York City would be likely to travel along a grid-like structure (which is why it is called Manhattan Distance). 
 
-First, we used a Linear Regression model to see if we could get a good generalization. Our model had these statistics:
+First, we used a Linear Regression model to see if we could get a good generalization. 
 
-| Metric | Value |
-| ------ | ----- |
-|Train MSE | 32765.832249823816 |
-|Test MSE | 32733.46595745812 |
-|R-squared | 0.34 |
-
-
-With an abysmally poor MSE, we realized that the simple linear model was insufficient to capture the complexity of the duration data. So, we decided to use the Polynomial Regression model with 2 degrees of freedom. Some initial testing with more degrees did not necessarily decrease the MSE (and increase the R2 value). So, we had these stats:
-
-| Metric | Value |
-| ------ | ----- |
-|Train MSE | 29151.005060962114 |
-|Test MSE | 29086.7998804891 |
-|R-squared | 0.417 |
-
-
-We had a significant improvement, with a reduced MSE and an increased R2 value. However, despite the improvement, the model was nowhere near accurate enough. In particular, the model would sometimes guess impossible values, such as a negative trip duration or a duration under 30 seconds. Because of the model's output limitations, we realized that adding more degrees to the model would not necessarily increase the model's accuracy, so we had to use a different architecture to increase our R2 score. We were also worried about overfitting at this point as we noticed that increasing the degrees did not increase the accuracy. 
-
-![Figure 9](images/figure9.png)
-
-Fig 9.  Predicted vs. actual fare durations for model 1, with the red line indicating perfect predictions. 
+With a poor MSE, we then tried Polynomial Regression with 2 degrees of freedom. Some initial testing with more degrees did not necessarily decrease the MSE (and increase the R2 value).
 
 ## Model 2
 
 Our second model focused on improving the predictions for both fare price and the trip duration. Firstly, to address the limitations of the previous models, we tried to implement a much more complex model, a neural network. Then, we built a decision tree when we realized this was not able to generalize to the data as well. 
 
 ### Fare Prediction
+
 As before, we split the data to 80:20, train and test and used a set seed to ensure that we could reproduce the material. Then, we used StandardScaler() to ensure that our data was normalized so that the neural network could perform better on it. Here, we decided to use tensorflow since it contained the libraries needed to build this model. This was 
 our model architecture: 
 
@@ -208,6 +181,32 @@ These values made sense because the model did not need to be too complex as we h
 
 # Results
 
+## Model 1
+
+### Fare Prediction
+
+After running our polynomial regression model, we got these results:
+
+| Metric | Value |
+| ------ | ----- |
+| Train MSE | 41.562368528526115 |
+| Test MSE | 38.86696472516666 |
+| R-squared | 0.782 |
+
+### Trip Duration Prediction
+
+After running our polynomial regression model, we got these results:
+
+| Metric | Value |
+| ------ | ----- |
+| Train MSE | 29151.005060962114 |
+| Test MSE | 29086.7998804891 |
+| R-squared | 0.417 |
+
+## Model 2
+
+### Fare Prediction
+
 For our fare price prediction, with our neural network, the best accuracy we got was as follows:
 
 | Metric | Value |
@@ -216,13 +215,13 @@ For our fare price prediction, with our neural network, the best accuracy we got
 | Test MSE | 9.399654295686593 |
 | R-squared | 0.871 |
 
-
 These results were quite significant, as had a much lower MSE, and a dramatically increased R2 value. This indicated that the model was getting very adept at generalizing to the data. However, we noticed that there was some slight overfitting as the Test MSE was higher than the Train MSE by ~10%. However, given the high R2 we found this acceptable. 
 
 ![Figure 10](images/figure10.png)
 
 Fig 10.  Predicted vs. actual fare amounts for model 2, with the red line indicating perfect predictions. 
 
+### Trip Duration Prediction
 
 For our duration prediction, our neural network didn’t work well at all, with a R2 value of -0.005. So, we tried a decision tree model, which worked much better, with a result of:
 
@@ -231,13 +230,45 @@ For our duration prediction, our neural network didn’t work well at all, with 
 | Test MSE | 48118.06320689619 |
 | R-squared | 0.472 |
 
-We found that despite a more complex model with better fine tuning, this model did not perform significantly better than the Polynomial Regression model. However, we did manage to achieve about 0.06 more points in the R2 metric which is an improvement nonetheless. 
-
-If we were to improve this, we would find more higher quality data, ideally with labels for date and time. Then, we would try more advanced mod@els such as the XGBoost or even combine multiple trees. We would continue using hyperparameter tuning to ensure that we have the best possible model given the constraints. 
-
 ![Figure 11](images/figure11.png)
 
 Fig 11.  Predicted vs. actual durations for model 2, with the red line indicating perfect predictions. 
+
+# Discussion
+
+## Model 1
+
+### Fare Prediction
+
+While our linear regression model captured some basic relationships, the relatively high error indicated that linear regression struggled with the complexity of the data. 
+
+Our polynomial regression model had a better error rate and better R2 value, so given that, we saw that this was quite ideal. Also, we forgot to apply feature scaling and normalization, which would have increased model performance, especially for Linear Regression. There was also a lack of more nuanced features, such as weather conditions or time of day as taxi driver fares can change due to the length of trips in these conditions. This would have allowed us to capture more variability of the data. We did not consider any regularization techniques such as Ridge or Lasso regression because we believed our model was not overfitting. This was due to the fact we had a relatively high R2 value, but was not egregiously high.
+
+![Figure 8](images/figure8.png)
+
+Fig 8.  Predicted vs. actual fare amounts for model 1, with the red line indicating perfect predictions. 
+
+### Trip Duration Prediction
+
+Our initial linear regression model had a really high error rate. After trying a polynomial regression model, we had a significant improvement, with a reduced MSE and an increased R2 value. 
+
+However, despite the improvement, the model was nowhere near accurate enough. In particular, the model would sometimes guess impossible values, such as a negative trip duration or a duration under 30 seconds. Because of the model's output limitations, we realized that adding more degrees to the model would not necessarily increase the model's accuracy, so we had to use a different architecture to increase our R2 score. We were also worried about overfitting at this point as we noticed that increasing the degrees did not increase the accuracy. 
+
+![Figure 9](images/figure9.png)
+
+Fig 9.  Predicted vs. actual fare durations for model 1, with the red line indicating perfect predictions. 
+
+## Model 2
+
+### Fare Prediction
+
+[TODO: add stuff here] 
+
+### Trip Duration Prediction
+
+With our decision tree, we found that despite using a more complex model with better fine tuning, this model did not perform significantly better than the Polynomial Regression model. However, we did manage to achieve about 0.06 more points in the R2 metric which is an improvement nonetheless. 
+
+If we were to improve this, we would find more higher quality data, ideally with labels for date and time. Then, we would try more advanced models such as the XGBoost or even combine multiple trees. We would continue using hyperparameter tuning to ensure that we have the best possible model given the constraints. 
 
 # Conclusion:
 
@@ -249,7 +280,7 @@ For our model, we opted to use 100k rows in an effort to avoid overfitting, so o
 
 Overall though, we’re pretty happy with the performance of this model. With the amount of noise that’s in our dataset, we know that achieving a 100% accuracy is generally unfeasible. Any way we change our model could have an adverse effect by causing overfitting. With our current model, we found that if we tried to train our neural network for more than 110 epochs, our model would overfit and the accuracy would actually get worse, so more isn’t always the best. 
 
-### Duration Prediction:
+### Trip Duration Prediction:
 
 The duration model, on the other hand, was a much harder task. When we tried the same neural network as for the fare price calculation, we got a R2 value of -0.005, which is worse than just guessing the mean. We believe this is because duration has a lot of random factors which can affect it while fare is most likely determined by distance traveled and time of the day. We think the random factors which affect the duration could have included traffic, rush hour, large events, etc. We decided that a decision tree would have an easier time generalizing for these random factors, so we tried a decision tree, and achieved a much better R2 value of 0.472.
 
@@ -261,7 +292,7 @@ We were pretty disappointed with the results of the initial neural network, but 
 
 # Statement of Contribution
 
-Aniket:
+Aniket: Contributed to both data exploration and preprocessing. Wrote model 1 with Kyle and Rahul, and wrote model 2 with entire team. Wrote results and conclusion section of writeup, and reviewed entire final writeup.
 
 Kyle:
 
