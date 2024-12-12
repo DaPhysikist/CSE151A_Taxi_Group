@@ -306,7 +306,7 @@ Kyle:
 
 Mahmoud:
 
-Pranav:
+Pranav: Setup code to import data from Kaggle into Google Collab as a pandas dataframe for data preprocessing. Found out what fitting graph meant on the intructions, and discussed with group on how to evaluate model based on fitting graph. Also made a discord post on it to get clarification from the professor (this may have also helped other groups out). Contributed the idea of using XGBoost for future improvements of our model. Wrote extensive portions of the model evaluation and fitting graph sections on the writeup for milestone 4, including the comparisons of the R2 score and MSE for the models.
 
 Rahul: Worked on creating the plots for plotting the model results. Contributed to the data preprocessing; Attempted model tuning for Milestone 4.
 
